@@ -3,6 +3,44 @@ import { Children } from 'react';
 import photo from '../../../assets/leticia.jpeg'
 import { TramSharp } from '@mui/icons-material';
 import { useDrawerContext } from '../../contexts';
+import { useMatch, useNavigate, useResolvedPath } from 'react-router-dom';
+
+interface IListItemLinkProps {
+  to: string,
+  icon: string,
+  label: string,
+  onClick: (() => void) | undefined
+}
+
+const ListItemLink: React.FC<IListItemLinkProps> = ({to, icon, label, onClick}) => {
+    
+    const navigate = useNavigate();
+
+    const resolvedPath = useResolvedPath(to);
+
+    const match = useMatch({ path: resolvedPath.pathname, end: false });
+
+    const handleClick = () => {
+        navigate(to);
+        onClick?.();
+    }
+
+    return(
+
+    <ListItemButton selected={!!match} onClick={handleClick}> 
+
+        <ListItemIcon>
+
+            <Icon> {icon} </Icon>
+
+        </ListItemIcon>
+
+         <ListItemText primary={label}/>
+
+    </ListItemButton>
+
+    )
+}
 
 interface ILayoutBaseDePaginaProps {
     children?: React.ReactNode,
@@ -14,7 +52,7 @@ export const MenuLateral: React.FC<ILayoutBaseDePaginaProps> =  ({ children }) =
 
     const smDown = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const { isDrawerOpen, toggleDrawerOpen } = useDrawerContext();
+    const { isDrawerOpen, toggleDrawerOpen, drawerOptions } = useDrawerContext();
 
     return(
         <>
@@ -37,17 +75,15 @@ export const MenuLateral: React.FC<ILayoutBaseDePaginaProps> =  ({ children }) =
 
                         <List component='nav'>
 
-                            <ListItemButton>
-
-                                <ListItemIcon>
-
-                                    <Icon> home </Icon>
-
-                                </ListItemIcon>
-
-                                <ListItemText primary='Inbox'/>
-
-                            </ListItemButton>
+                            {drawerOptions.map(drawerOptions => (
+                                <ListItemLink
+                                to={drawerOptions.path}
+                                key={drawerOptions.path}
+                                icon={drawerOptions.icon}
+                                label={drawerOptions.label}
+                                onClick={smDown ? toggleDrawerOpen : undefined}
+                            />
+                            ))}
 
                         </List>
                             
